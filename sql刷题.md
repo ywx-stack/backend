@@ -1,3 +1,13 @@
+# 力扣专项：SQL入门
+
+1.选择
+
+2.排序 & 修改
+
+3.字符串处理函数/正则
+
+4.组合查询 & 指定选取
+
 # 595.大的国家
 
 第一种解法：`or`关键字
@@ -68,6 +78,8 @@ WHERE
 	(select customerid from orders)
 ```
 
+------
+
 # 1873.计算特殊奖金
 
 `case when ... then ... else... end`
@@ -84,7 +96,7 @@ end as 新表中的字段
 
 `mod()`：余数
 
-`rlike '^M'`：正则表达式，也称 模糊匹配，只要字段的值中存在要查找的部分 就会被选择出来。而`like`是全字段匹配。
+`rlike '^M'`：正则表达式，也称 模糊匹配，只要字段的值中存在要查找的部分 就会被选择出来。而`like`是全字段匹配。`regexp`与`rlike`相同。
 
 `order by`：排序，默认升序，降序需要加`desc`
 
@@ -148,5 +160,160 @@ select user_id,
 	concat(upper(left(name,1)),lower(substring(name,2))) as name
 from users
 order by user_id
+```
+
+# 1484.按日期分组销售产品
+
+`count()`：计数
+
+`discinct`:不同的
+
+`group_concat()`:
+
+```
+# 将分组中column1这一列对应的多行的值按照column2 升序或者降序进行连接，其中分隔符为seq
+# 如果用到了DISTINCT，将表示将不重复的column1按照column2升序或者降序连接
+# 如果没有指定SEPARATOR的话，也就是说没有写，那么就会默认以 ','分隔
+GROUP_CONCAT([DISTINCT] column1 [ORDER BY column2 ASC\DESC] [SEPARATOR seq]);
+```
+
+```sql
+select sell_date,
+	count(distinct product) num_sold,
+	group_concat(distinct product) products
+from
+	activities
+group by sell_date
+order by sell_date
+```
+
+# 1527.患某种疾病的患者
+
+`rlike`更具体的用法
+
+```sql
+1、模糊查询字段中包含某关键字的信息。
+
+如：查询所有包含“希望”的信息：select * from student where name rlike '希望'
+
+2、模糊查询某字段中不包含某关键字信息。
+
+如：查询所有包含“希望”的信息：select * from student where name not rlike '希望'
+
+3、模糊查询字段中以某关键字开头的信息。
+
+如：查询所有以“大”开头的信息：select * from student where name not rlike '^大'
+
+4、模糊查询字段中以某关键字结尾的信息。
+
+如：查询所有以“大”结尾的信息：select * from student where name not rlike '大$'
+
+5、模糊匹配或关系，又称分支条件。
+
+如：查询出字段中包含“幸福，幸运，幸好，幸亏”的信息：
+
+select * from student where name  rlike '幸福|幸运|幸好|幸亏'
+
+注意正则表达式或关系的表达方式为 |
+————————————————
+版权声明：本文为CSDN博主「GaoYan1024」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+原文链接：https://blog.csdn.net/GaoYan1024/article/details/122172278
+```
+
+```sql
+SELECT * FROM PATIENTS
+WHERE CONDITIONS REGEXP '^DIAB1|\\sDIAB1'
+```
+
+'\s'表示空格，MySQL 在插入数据库的时候，会自动去除转义字符也就是反斜杠“\”。
+
+# 1965.丢失信息的雇员
+
+`union all `：不带自动去重的联结两表
+
+`having`的用法：`查询语句 + group by + having +聚合函数统计`，常见的聚合函数有`sum(),avg(),count()`。
+
+```sql
+select employee_id
+from (
+    select employee_id from Employees
+    union all
+    select employee_id from Salaries
+) as t
+group by employee_id
+having count(employee_id) = 1
+order by employee_id
+```
+
+# 1795.每个产品在不同商店的价格
+
+横表转竖表
+
+```sql
+select product_id,'store1' as store, store1 as price
+from Products where store1 is not null
+union all 
+select product_id,'store2' as store, store2 as price
+from Products where store2 is not null
+union all 
+select product_id,'store3' as store, store3 as price
+from Products where store3 is not null
+```
+
+# 608.树节点
+
+颇有结合算法和sql的奇妙之处
+
+```sql
+select id
+case 
+	when tree.id = (select atree.id from tree atree where p_id is null) then 'Root'
+	when tree.id in (select atree.p_id from tree atree) then 'Inner'
+	else 'Leaf'
+end as type
+from tree
+order by id
+```
+
+另一方法：使用`IF`函数，来避免复杂的流控制语句。
+
+```
+IF( expr1 , expr2 , expr3 )
+expr1 的值为 TRUE，则返回值为 expr2
+expr1 的值为FALSE，则返回值为 expr3
+```
+
+```sql
+SELECT
+    atree.id,
+    IF(ISNULL(atree.p_id),
+        'Root',
+        IF(atree.id IN (SELECT p_id FROM tree), 'Inner','Leaf')) Type
+FROM
+    tree atree
+ORDER BY atree.id
+
+作者：LeetCode
+链接：https://leetcode.cn/problems/tree-node/solution/shu-jie-dian-by-leetcode/
+来源：力扣（LeetCode）
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+```
+
+# 176.第二高的薪水
+
+`ifnull(expr1,alt_value)`与上述`if` 类似；
+
+`limit n` 子句表示查询结果返回前n条数据
+
+`offset n` 表示跳过x条语句
+
+`limit y offset x `分句表示查询结果跳过 x 条数据，读取前 y 条数据
+
+```sql
+select 
+	ifnull((select distinct salary from employee 
+            order by salary desc
+            limit 1 offset 1),null) 
+            as secondhightestsalary
 ```
 
