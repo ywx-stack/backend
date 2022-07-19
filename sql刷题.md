@@ -1,3 +1,5 @@
+[TOC]
+
 # 力扣专项：SQL入门
 
 1.选择
@@ -7,6 +9,8 @@
 3.字符串处理函数/正则
 
 4.组合查询 & 指定选取
+
+5.合并
 
 # 595.大的国家
 
@@ -315,5 +319,41 @@ select
             order by salary desc
             limit 1 offset 1),null) 
             as secondhightestsalary
+```
+
+# 175.组合两个表
+
+![img](https://pic.leetcode-cn.com/ad3df1c4ecc7d2dbe85f92cdde8ec9a731fdd20dc4c5629ecb372b21de26c682-1.jpg)
+
+```sql
+select firstname,lastname,city,state
+from person left join address
+on person.personid = address.personid
+```
+
+# 1581.进店却未进行过交易的顾客
+
+上图的左下的情况。
+
+```sql
+SELECT 
+    customer_id, COUNT(customer_id) count_no_trans
+FROM 
+    visits v
+LEFT JOIN 
+    transactions t ON v.visit_id = t.visit_id
+WHERE amount IS NULL
+GROUP BY customer_id;
+```
+
+# 1148.文章浏览I
+
+很水
+
+```sql
+select distinct author_id as id
+from views
+where author_id = viewer_id
+order by id
 ```
 

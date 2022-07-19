@@ -1,6 +1,8 @@
 # 剑指offer
 本笔记用于记录三刷剑指offer，重点为实现自己对于题目的理解和解法。
 
+[TOC]
+
 ## 9.用两个栈实现队列
 
 ![image-20220717140147608](picture/image-20220717140147608.png)
@@ -32,6 +34,9 @@ class CQueue:
 # param_2 = obj.deleteHead()
 ```
 
+- 时间复杂度`appendTail()`函数为 *O*(1) ；`deleteHead()` 函数在 *N* 次队首元素删除操作中总共需完成 *N* 个元素的倒序。
+- 空间复杂度*O*(N):最差情况保存N个元素。
+
 ## 30.包含min函数的栈
 
 用两个stack，分别功能如下：
@@ -59,11 +64,12 @@ class MinStack:
         return self.B[-1]
 ```
 
-<栈与队列>小总结：今天的两题都是对两个stack进行操作，一个用于接收新数据，另一个用于辅助完成对应的功能。很奇妙的思路。
+- 时间复杂度*O(1)*
+- 空间复杂度*O(N)*
+
+**<栈与队列>小总结：今天的两题都是对两个stack进行操作，一个用于接收新数据，另一个用于辅助完成对应的功能。很奇妙的思路。**
 
 ------
-
-
 
 ## 6.从尾到头打印链表
 
@@ -80,6 +86,9 @@ class Solution:
         return res
 ```
 
+- 时间复杂度*O*(N)
+- 空间复杂度*O*(N)
+
 ```python
 #辅助栈
 class Solution:
@@ -90,6 +99,9 @@ class Solution:
             head=head.next
         return res[::-1]
 ```
+
+- 时间复杂度*O*(N)
+- 空间复杂度*O*(N)
 
 ## 24.反转列表
 
@@ -109,6 +121,9 @@ class Solution:
         return pre
 ```
 
+- 时间复杂度*O*(N) ：遍历一遍
+- 空间复杂度*O*(1)：指针常数的额外空间
+
 递归遍历链表，当越过尾结点后终止递归，回溯时修改各节点的`next`引用指向（这是递归的精髓）
 
 ```python
@@ -124,6 +139,9 @@ class Solution:
 ```
 
 这个递归代码很巧妙的一步是`res`,一直都是`最后一个节点的位置`！
+
+- 时间复杂度*O*(N)：一轮遍历。
+- 空间复杂度*O*(N)：遍历链表的递归深度为N，使用N的额外空间。
 
 ## 35.复杂链表的复制
 
@@ -159,7 +177,10 @@ class Solution:
         return dic[head]
 ```
 
-```python
+- 时间复杂度*O*(N)： 两列遍历
+- 空间复杂度*O*(N) ：哈希表`dic`使用线性大小的额外空间
+
+```PYTHON
 # 拼接+拆分
 class Solution:
     def copyRandomList(self, head: 'Node') -> 'Node':
@@ -191,7 +212,142 @@ class Solution:
 
 着重注意拆分的时候的代码，顺序是有问题的，建议画图分析。
 
-<链表（简单）>总结：
+- 时间复杂度*O*(N) ：三轮遍历链表。
+- 空间复杂度*O*(1) ：节点引用变量使用常数大小的额外空间。
 
-- 3道链表题，注意前两天用递归的时候，是在回溯的时候做需要的操作。
-- 链表题的关键是对指针的理解，尤其涉及多个next的时候，画图更清晰。
+**<链表（简单）>总结：**
+
+**3道链表题，注意前两天用递归的时候，是在回溯的时候做需要的操作。**
+
+**链表题的关键是对指针的理解，尤其涉及多个next的时候，画图更清晰。**
+
+------
+
+## 05.替换空格
+
+感觉主要是考察c++语法的原地替换，但是python黑魔法。
+
+```python
+class Solution:
+    def replaceSpace(self, s: str) -> str:
+        res =[]
+        for c in s :
+            if c == " ": res.append("%20")
+            else : res.append(c)
+        return ''.join(res)
+        #join这个方法，将可迭代的数据类型，转为字符串或者bytes，没错可以转为bytes类型。注意这个可迭代的数据中的元素必须是相同类型的。
+```
+
+- 时间复杂度*O*(N) ：遍历链表。
+- 空间复杂度*O*(N) 
+
+```c++
+// c++原地修改
+class Solution {
+public:
+    string replaceSpace(string s) {
+        int count = 0, len = s.size();
+        // 统计空格数量
+        for (char c : s) {
+            if (c == ' ') count++;
+        }
+        // 修改 s 长度
+        s.resize(len + 2 * count);
+        // 倒序遍历修改
+        for(int i = len - 1, j = s.size() - 1; i < j; i--, j--) {
+            if (s[i] != ' ')
+                s[j] = s[i];
+            else {
+                s[j - 2] = '%';
+                s[j - 1] = '2';
+                s[j] = '0';
+                j -= 2;
+            }
+        }
+        return s;
+    }
+};
+
+作者：Krahets
+链接：https://leetcode.cn/leetbook/read/illustration-of-algorithm/50c26h/
+来源：力扣（LeetCode）
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+```
+
+- 时间复杂度*O*(N) ：遍历链表。
+- 空间复杂度*O*(1) 
+
+## 58-II.左旋转字符串
+
+方法1：字符串切片
+
+```python
+class Solution:
+    def reverseLeftWords(self, s: str, n: int) -> str:
+        return s[n:] + s[:n]
+```
+
+- 时间复杂度*O*(*N*)
+- 空间复杂度*O*(*N*) 
+
+方法2：列表遍历拼接
+
+```python
+class Solution:
+    def reverseLeftWords(self, s: str, n: int) -> str:
+		res = []
+        for i in range(n,len(s)):
+            res.append(s[i])
+        for i in range(n):
+            res.append(s[i])
+        return ''.join(res)
+```
+
+- 时间复杂度*O*(*N*)
+- 空间复杂度*O*(*N*) 
+
+方法3：字符串遍历拼接
+
+```python
+class Solution:
+    def reverseLeftWords(self, s: str, n: int) -> str:
+		res = ''
+        for i in range(n,len(s)):
+            res += s[i]
+        for i in range(n):
+            res += s[i]
+        return res
+```
+
+- 时间复杂度*O*(*N*)
+- 空间复杂度*O*(*N*) 
+
+方法4：三次翻转（C++）
+
+```c++
+class Solution {
+public:
+    string reverseLeftWords(string s, int n) {
+        reverseString(s, 0, n - 1);
+        reverseString(s, n, s.size() - 1);
+        reverseString(s, 0, s.size() - 1);
+        return s;
+    }
+private:
+    void reverseString(string& s, int i, int j) {
+        while(i < j) swap(s[i++], s[j--]);
+    }
+};
+
+作者：Krahets
+链接：https://leetcode.cn/leetbook/read/illustration-of-algorithm/58eckc/
+来源：力扣（LeetCode）
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+```
+
+- 时间复杂度*O*(*N*)
+- 空间复杂度*O*(*1*) 
+
+此题的关键，也是对字符串做原地替换，但是这个的前提是C++，python的黑魔法不支持这些操作。
+
+**<字符串（简单）>其实用python很简单，但是少了c++的考点，可以稍微补充一下c++的做法。**
