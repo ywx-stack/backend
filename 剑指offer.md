@@ -351,3 +351,286 @@ private:
 此题的关键，也是对字符串做原地替换，但是这个的前提是C++，python的黑魔法不支持这些操作。
 
 **<字符串（简单）>其实用python很简单，但是少了c++的考点，可以稍微补充一下c++的做法。**
+
+------
+
+## 03.数组中重复的数字
+
+思路1：自己想的最直观的方法
+
+```python
+class Solution:
+    def findRepeatNumber(self, nums: List[int]) -> int:
+        # 排序，遍历
+        nums.sort()
+        for i in range(1,len(nums)):
+            if nums[i-1] == nums[i]:
+                return nums[i]
+        return nums[0]
+```
+
+- 时间复杂度*O*(*N*+logN):遍历+排序所需的时间
+- 空间复杂度*O*(*1*) ：不引入额外空间
+
+思路2：借助哈希/set
+
+```python
+class Solution:
+    def findRepeatNumber(self, nums: List[int]) -> int:
+        hash = {}
+        for num in nums:
+            if num in hash:
+                return num
+            hash[num] = num
+        return 0
+```
+
+- 时间复杂度*O*(*N*):遍历一遍
+- 空间复杂度*O*(*N*) 
+
+因为只需要存一个值，可以用`set`
+
+```python
+class Solution:
+    def findRepeatNumber(self, nums: [int]) -> int:
+        dic = set()
+        for num in nums:
+            if num in dic: return num
+            dic.add(num)
+        return -1
+```
+
+- 时间复杂度*O*(*N*):遍历一遍
+- 空间复杂度*O*(*N*) 
+
+方法3：原地交换
+
+一个萝卜一个坑，如果坑里有萝卜，肯定是重复的萝卜了
+
+```python
+class Solution:
+    def findRepeatNumber(self, nums: List[int]) -> int:
+        for i in range(len(nums)):
+            if nums[i] != i:
+                if nums[nums[i]] == nums[i]:
+                    return nums[i]
+                nums[nums[i]], nums[i] = nums[i], nums[nums[i]]
+        return nums[0]
+```
+
+- 时间复杂度*O*(*N*):遍历一遍
+- 空间复杂度*O*(*1*) 
+
+## 53-I.在排序数组中查找数字
+
+```python
+class Solution:
+    def search(self, nums: List[int], target: int) -> int:
+        # 排好序的可以用二分查找
+        l, r = 0, len(nums)-1
+        while l <= r:
+            mid = (l + r) // 2
+            # 中间值 比 目标值 大 ，在左侧
+            if nums[mid] > target:
+                r = mid - 1
+            elif nums[mid] < target: #在右侧
+                l = mid + 1
+            else:# 相等
+                if nums[r] != target:
+                    r -= 1
+                elif nums[l] != target:
+                    l += 1
+                else:
+                    break
+        return r - l + 1
+```
+
+- 时间复杂度*O*(*logN*):二分
+- 空间复杂度*O*(*1*) 
+
+## 53-II.0~n-1中缺失的数字
+
+```python
+class Solution:
+    def missingNumber(self, nums: List[int]) -> int:
+        # 二分
+        l, r = 0, len(nums)-1
+        while l <= r:
+            mid = (l+r)//2
+            if nums[mid] > mid:
+                r = mid - 1
+            elif nums[mid] == mid:
+                l = mid + 1
+        return l
+```
+
+- 时间复杂度*O*(*logN*):二分
+- 空间复杂度*O*(*1*) 
+
+**<查找算法（简单）>注意排序数组中用二分法查找最快，默认下标当索引，重点是利用到数组的特性。**
+
+## 04.二维数组中的查找
+
+关键在于数组特性，从左到右递增，从上到下也递增
+
+```python
+class Solution:
+    def findNumberIn2DArray(self, matrix: List[List[int]], target: int) -> bool:
+        if not matrix : return False
+        n = len(matrix)
+        m = len(matrix[0])
+        i, j = n-1, 0
+        while i >= 0 and j < m:
+            if matrix[i][j] > target:
+                i -= 1
+            elif matrix[i][j] < target:
+                j += 1
+            else:
+                return True
+        return False
+```
+
+- 时间复杂度*O*(*N*+*M*):遍历一遍
+- 空间复杂度*O*(*1*) 
+
+## 11.旋转数组的最小数字
+
+这道题的分析值得多看两遍，还是很复杂的。尤其是对等号的判断。
+
+看官方题解的视频，可以理解成 二分和暴力法的结合！
+
+```python
+class Solution:
+    def minArray(self, numbers: List[int]) -> int:
+        # 二分 + 暴力
+        l, r = 0, len(numbers)-1
+        while l < r:
+            mid = (l+r)//2
+            if numbers[mid] > numbers[r]:
+                l = mid + 1
+            elif numbers[mid] < numbers[r]:
+                r = mid 
+            else:
+                r -= 1 #暴力
+        return numbers[l]
+```
+
+- 时间复杂度*O*(*logN*)，但是在数组全部相等的情况下是O(N)
+- 空间复杂度*O*(*1*) 
+
+## 50.第一个只出现一次的字符
+
+暴力法了话是O（N^2)，借助常规的空间换时间的思路，引入哈希表：
+
+```python
+class Solution:
+    def firstUniqChar(self, s: str) -> str:
+        dic = {}
+        for c in s:
+            if c in dic:
+                dic[c] += 1
+            else:
+                dic[c] = 1
+        for c in s:
+            if dic[c] == 1:
+                return c
+        return ' '
+```
+
+- 时间复杂度*O*(*N*):遍历2遍
+- 空间复杂度*O*(*1*) :虽然引入了哈希，但是只有26个字母*O*(*26*) =*O*(*1*)
+
+因为python3.6之后，默认字典是有序的，因此可以写成下面：
+
+```python
+class Solution:
+    def firstUniqChar(self, s: str) -> str:
+        dic = {}
+        for c in s:
+            dic[c] = not c in dic
+        for k, v in dic.items():
+            if v: return k
+        return ' '
+```
+
+相对第一种方法，仅遍历了一遍。
+
+**<查找算法（中等）>，今天的三道题，重点还是分析题目的特性；不过不建议直接背题目的最优解，要自行学习分析思路，第二道旋转数组的最小数字很值得学习，一步一步的分析。**
+
+------
+
+## 32-I.从上到下打印二叉树
+
+二叉树的广度优先搜索（`BFS`）,需要借助队列
+
+```python
+class Solution:
+    def levelOrder(self, root: TreeNode) -> List[int]:
+        if not root:return []
+        deque = collections.deque()
+        res = []
+        deque.append(root)
+        while deque:
+            node = deque.popleft()
+            res.append(node.val)
+            if node.left:deque.append(node.left)
+            if node.right: deque.append(node.right)
+        return res
+```
+
+- 时间复杂度*O*(*N*)
+- 空间复杂度*O*(*N*) 
+
+## 32-II.从上到下打印二叉树II
+
+```python
+class Solution:
+    def levelOrder(self, root: TreeNode) -> List[List[int]]:
+        if not root:return []
+        deque = collections.deque()
+        res = []
+        deque.append(root)
+        while deque:
+            tmp = []
+            n = len(deque)
+            for i in range(n):
+                node = deque.popleft()
+                tmp.append(node.val)
+                if node.left:deque.append(node.left)
+                if node.right:deque.append(node.right)
+            res.append(tmp)
+        return res
+```
+
+- 时间复杂度*O*(*N*)
+- 空间复杂度*O*(*N*) 
+
+## 32-III.从上到下打印二叉树III
+
+```python
+class Solution:
+    def levelOrder(self, root: TreeNode) -> List[List[int]]:
+        if not root:return []
+        deque = collections.deque()
+        res = []
+        deque.append(root)
+        flag = 0
+        while deque:
+            tmp = collections.deque()
+            for _ in range(len(deque)):
+                node = deque.popleft()
+                if flag%2 == 0:
+                    tmp.append(node.val)
+                else:
+                    tmp.appendleft(node.val)
+                if node.left:deque.append(node.left)
+                if node.right:deque.append(node.right)
+            flag += 1
+            res.append(list(tmp))
+        return res
+```
+
+- 时间复杂度*O*(*N*)
+- 空间复杂度*O*(*N*) 
+
+**<搜索与回溯算法（简单）>主要是二叉树的层序遍历，记住要借助双端队列就可以！**

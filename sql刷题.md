@@ -357,3 +357,164 @@ where author_id = viewer_id
 order by id
 ```
 
+------
+
+# 197.上升的温度
+
+趁着把《MySQL必知必会》第15章和第16章过一遍，讲了联结和高级联结；
+
+**内部联结or等值联结：**
+
+下面两种写法是一致的
+
+```sql
+select a,b,c
+from t1 inner join t2
+on t1.id=t2.id
+```
+
+```sql
+select a,b,c
+from t1,t2
+where t1.id = t2.id
+```
+
+推荐使用`inner join`的写法。
+
+如果没有后面的条件，就是返回 笛卡儿积（第一个表的行与第二个表的每一行配对）,也被称为`cross join`。
+
+**自联结：**(自己和自己联结，用于查找符合某条件的其它数据)
+
+```sql
+select t1.a,t1.b
+from table1 as t1,table2 as t2
+where t1.id = t2.id and t2.id='aaa'
+```
+
+**外联结**：可以参考上上图
+
+**本题还涉及对时间做差，可使用**
+
+`datediff(d1,d2)`：返回天数差
+
+```sql
+select w1.id
+from weather w1 inner join weather w2
+on datediff(w1.recordDate , w2.recordDate) = 1
+where w1.Temperature >  w2.Temperature 
+```
+
+# 607.销售员
+
+没什么新知识点。
+
+```sql
+SELECT
+    s.name
+FROM
+    salesperson s
+WHERE
+    s.sales_id NOT IN (SELECT
+            o.sales_id
+        FROM
+            orders o
+                LEFT JOIN
+            company c ON o.com_id = c.com_id
+        WHERE
+            c.name = 'RED')
+;
+
+作者：LeetCode
+链接：https://leetcode.cn/problems/sales-person/solution/xiao-shou-yuan-by-leetcode/
+来源：力扣（LeetCode）
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+```
+
+# 1141.查询近30天活跃用户数
+
+可以用`between and`
+
+```sql
+select activity_date as day,count(distinct user_id) as active_users
+from activity
+where datediff('2019-07-27',activity_date) < 30 and datediff('2019-07-27',activity_date) > 0
+group by activity_date
+```
+
+# 1693.每天的领导和合伙人
+
+```sql
+select date_id,make_name,count(distinct lead_id) as unique_leads,count(distinct partner_id) as unique_partners
+from dailysales
+group by date_id , make_name
+```
+
+# 1729.求关注者的数量
+
+```sql
+select user_id,count(distinct follower_id) as followers_count
+from followers
+group by user_id
+order by user_id
+```
+
+# 586.订单最多的客户
+
+我的答案
+
+```sql
+select customer_number
+from (select customer_number, count(customer_number) as n
+from orders
+group by customer_number
+order by n desc limit 1 ) a
+```
+
+官方题解
+
+```sql
+SELECT
+    customer_number
+FROM
+    orders
+GROUP BY customer_number
+ORDER BY COUNT(*) DESC
+LIMIT 1
+```
+
+# 511.游戏玩法分析I
+
+`min（）`
+
+```sql
+select player_id,min(event_date) as first_login
+from activity
+group by player_id
+```
+
+# 1890.2020年最后一次登录
+
+```sql
+select user_id,max(time_stamp) as last_stamp
+from logins
+where time_stamp between '2020-01-01 00:00:00' and '2020-12-31 23:59:59'
+group by user_id
+```
+
+网上题解，注意`year()`
+
+```sql
+SELECT user_id, max(time_stamp) last_stamp      #求最大的日期用max，但是如何限定是2020年呢？
+FROM Logins
+WHERE year(time_stamp) = '2020'                      #看这！！！！！！！用year函数增加条件为2020年
+GROUP BY user_id;                                              #这个好理解就是分个组
+```
+
+# 1741.查找每个员工花费的总时间
+
+```sql
+select event_day as day,emp_id,sum(out_time-in_time) as total_time
+from employees
+group by emp_id,event_day
+```
+
