@@ -518,3 +518,75 @@ from employees
 group by emp_id,event_day
 ```
 
+# 1393.股票的资本损益
+
+```sql
+select stock_name,sum(
+    case
+    when operation ='sell' then price
+    else -price
+    end) as capital_gain_loss 
+from Stocks
+group by stock_name
+```
+
+# 1407.排名靠前的旅行者
+
+```sql
+select name,case when travelled_distance is null then 0 else travelled_distance end as travelled_distance
+from users left join (select user_id,sum(distance) as travelled_distance 
+from rides
+group by user_id) a
+on users.id = a.user_id
+order by travelled_distance desc,name
+```
+
+# 1158.市场分析I
+
+```sql
+select user_id as buyer_id,join_date,ifnull(orders_in_2019,0) as orders_in_2019
+from users left join (select buyer_id,count(*) as orders_in_2019
+from orders
+where year(order_date) = '2019'
+group by buyer_id) tmp
+on users.user_id = tmp.buyer_id
+```
+
+# 182.查找重复的电子邮箱
+
+```sql
+select email
+from person
+group by email
+having count(email)>1
+```
+
+# 1050.合作过至少三次的演员和导演
+
+```sql
+select actor_id,director_id
+from actordirector
+group by actor_id,director_id
+having count(*)>2
+```
+
+# 1587.银行账户概要II
+
+```sql
+select name,sum(amount) as balance
+from users a left join transactions b
+on a.account = b.account
+group by b.account
+having sum(amount)>10000
+```
+
+# 1084.销售分析III
+
+```sql
+select a.product_id,product_name
+from product a left join sales b
+on a.product_id = b.product_id
+group by product_id
+having min(sale_date) >= '2019-01-01' and max(sale_date) <= '2019-03-31'
+```
+

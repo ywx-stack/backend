@@ -634,3 +634,132 @@ class Solution:
 - 空间复杂度*O*(*N*) 
 
 **<搜索与回溯算法（简单）>主要是二叉树的层序遍历，记住要借助双端队列就可以！**
+
+## 26.树的子结构
+
+两个递归；
+
+一个递归是A,一个递归是进行A、B相等判断；
+
+然后分析每一个的终止条件和返回条件；
+
+![image-20220723193819530](picture/image-20220723193819530.png)
+
+```python
+class Solution:
+    def isSubStructure(self, A: TreeNode, B: TreeNode) -> bool:
+        if not A or not B:return False
+        def recur(A,B):
+            if not B:return True
+            if not A or A.val !=B.val :return False
+            return recur(A.left,B.left) and recur(A.right,B.right)
+        return recur(A,B) or self.isSubStructure(A.left,B) or self.isSubStructure(A.right,B)
+```
+
+- 时间复杂度*O*(*MN*)
+- 空间复杂度*O*(*N*) 
+
+## 27.二叉树的镜像
+
+递归：
+
+```python
+class Solution:
+    def mirrorTree(self, root: TreeNode) -> TreeNode:
+        if not root:return
+        tmp = root.left
+        root.left = root.right
+        root.right = tmp
+        self.mirrorTree(root.left)
+        self.mirrorTree(root.right)
+        return root
+```
+
+- 时间复杂度*O*(*N*)
+- 空间复杂度*O*(*N*) 
+
+辅助栈：
+
+```python
+class Solution:
+    def mirrorTree(self, root: TreeNode) -> TreeNode:
+        #辅助栈仅用于遍历每个节点
+        if not root : return root
+        res = []
+        res.append(root)
+        while res:
+            node = res.pop()
+            if node.left : res.append(node.left)
+            if node.right : res.append(node.right)
+            node.left ,node.right = node.right, node.left
+        return root
+```
+
+- 时间复杂度*O*(*N*)
+- 空间复杂度*O*(*N*) 
+
+## 28.对称的二叉树
+
+很巧妙的思路
+
+```python
+class Solution:
+    def isSymmetric(self, root: TreeNode) -> bool:
+        # 先遍历，再验证
+        def recur(L,R):
+            if not L and not R:return True
+            if not L or not R or L.val != R.val:return False
+            return recur(L.left,R.right) and recur(L.right,R.left)
+        return not root or recur(root.left,root.right)
+```
+
+**<搜索与回溯算法（简单）>其实和递归的思路很一致，以某种方式遍历，遍历的时候增加条件判断。**
+
+## 10-I.斐波那契数列
+
+```python
+class Solution:
+    def fib(self, n: int) -> int:
+        a,b=0,1
+        for _ in range(n):
+            a,b = b,(a+b)%1000000007
+        return a
+```
+
+- 时间复杂度*O*(*N*)
+- 空间复杂度*O*(*1*) 
+
+## 10-II.青蛙跳台阶问题
+
+```python
+class Solution:
+    def numWays(self, n: int) -> int:
+        if n == 0: return 1
+        if n == 1: return 1
+        if n == 2: return 2
+        a,b = 1,2
+        for _ in range(n-2):
+            a ,b = b ,(a+b)%1000000007
+        return b
+```
+
+- 时间复杂度*O*(*N*)
+- 空间复杂度*O*(*1*) 
+
+## 63.股票的最大利润
+
+```python
+class Solution:
+    def maxProfit(self, prices: List[int]) -> int:
+        if not prices:return 0
+        m_min = prices[0]
+        res = 0
+        for i in prices:
+            if i < m_min:
+                m_min = i
+            res = max(i-m_min,res)
+        return res
+```
+
+- 时间复杂度*O*(*N*)
+- 空间复杂度*O*(*1*) 
