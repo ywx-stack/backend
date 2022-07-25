@@ -748,6 +748,8 @@ class Solution:
 
 ## 63.股票的最大利润
 
+![img](https://pic.leetcode-cn.com/1600880605-QGgqZW-Picture1.png)
+
 ```python
 class Solution:
     def maxProfit(self, prices: List[int]) -> int:
@@ -758,6 +760,119 @@ class Solution:
             if i < m_min:
                 m_min = i
             res = max(i-m_min,res)
+        return res
+```
+
+- 时间复杂度*O*(*N*)
+- 空间复杂度*O*(*1*) 
+
+## 42.连续子数组的最大和
+
+动态规划!
+
+![img](https://pic.leetcode-cn.com/77d1aa6a444743d3c8606ac951cd7fc38faf68a62064fd2639df517cd666a4d0-Picture1.png)
+
+```python
+class Solution:
+    def maxSubArray(self, nums: List[int]) -> int:
+        for i in range(1,len(nums)):
+            nums[i] += max(nums[i-1],0)
+        return max(nums)
+```
+
+- 时间复杂度*O*(*N*)
+- 空间复杂度*O*(*1*) 
+
+## 47.礼物的最大价值
+
+与上一题思路类似
+
+```python
+class Solution:
+    def maxValue(self, grid: List[List[int]]) -> int:
+        n = len(grid)
+        m = len(grid[0])
+        i,j = 0, 0
+        for i in range(n):
+            for j in range(m):
+                if i == 0 and j==0:
+                    continue
+                elif i == 0:
+                    grid[i][j] += grid[i][j-1]
+                elif j == 0:
+                    grid[i][j] += grid[i-1][j]
+                else:
+                    grid[i][j] += max(grid[i][j-1],grid[i-1][j])
+        return grid[n-1][m-1]
+```
+
+- 时间复杂度*O*(*NM*)
+- 空间复杂度*O*(*1*) 
+
+## 46.把数字翻译成字符串
+
+类似跳台阶，但是要增加判断条件;
+
+<img src="https://pic.leetcode-cn.com/1603462412-iUcKzA-Picture1.png" alt="img" style="zoom:50%;" />
+
+注意画图，画值分析，而不是一直在脑海中想。
+
+```python
+class Solution:
+    def translateNum(self, num: int) -> int:
+        a = 1
+        b = 1
+        y = num % 10
+        while num>9:
+            num //= 10
+            x = num % 10
+            if 9 < x*10 + y <26:
+                c = a + b
+            else:
+                c = a
+            a ,b = c, a
+            y = x
+        return a
+```
+
+- 时间复杂度*O*(*N*)
+- 空间复杂度*O*(*1*) 
+
+## 48.最长不含重复字符的子字符串
+
+动态规划:
+
+![img](https://pic.leetcode-cn.com/1599287290-mTdFye-Picture1.png)
+
+```python
+class Solution:
+    def lengthOfLongestSubstring(self, s: str) -> int:
+        dic = {}
+        res = tmp = 0
+        for j in range(len(s)):
+            i = dic.get(s[j],-1) # 获取索引 i
+            dic[s[j]] = j # 更新哈希表
+            tmp = tmp + 1 if tmp < j - i else j - i
+            res = max(res,tmp)
+        return res
+```
+
+- 时间复杂度*O*(*N*)
+- 空间复杂度*O*(*1*) 
+
+哈希表+双指针
+
+```python
+class Solution:
+    def lengthOfLongestSubstring(self, s: str) -> int:
+        dic = {}
+        i = -1
+        res = 0
+        for j in range(len(s)):
+            if s[j] in dic:
+                i = max(dic[s[j]],i)
+            dic[s[j]] = j
+            res = max(res,j-i)
         return res
 ```
 
